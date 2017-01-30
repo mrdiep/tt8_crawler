@@ -96,6 +96,32 @@ var truyentranhparser = {
         });
 
     },
+    parseRssDetailUsingRssRequest : function(comicLink, chapterCallback) {
+
+        var link = comicLink.replace('http://truyentranh8.net/', 'http://truyentranh8.net/RSS.php?truyen=');
+
+        if (link.endsWith('/')) {
+            link = link.substring(0, link.length - 1);
+        }
+
+        console.log("request link = " + link);
+
+        var feed = require('rss-to-json');
+        feed.load(link, function(err, rss) {
+
+            try {
+                rss.items.forEach(function(item, index) {
+
+                    chapterCallback(item);
+                });
+            } catch (err) {
+                console.log(err);
+                console.log(rss);
+            }
+
+        });
+
+    },
     parseChapter : function(chapter, imagesCallback) {
 
         var parse = function(text) {

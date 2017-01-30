@@ -1,5 +1,5 @@
-var database = require('./database');
-var parser = require('./WebParser');
+var database = require('./tt-database');
+var parser = require('./tt-web-parser');
 
 database.init();
 parser.init();
@@ -7,7 +7,7 @@ parser.init();
 for (var page = 1; page <= 378; page++) {// 378
     parser.getPage(page, function(comic) {
 
-        parser.parseRssDetail(comic.href, function(chapter) {
+        parser.parseRssDetailUsingRssRequest(comic.href, function(chapter) {
 
             parser.parseChapter(chapter, function(err, imageArray) {
 

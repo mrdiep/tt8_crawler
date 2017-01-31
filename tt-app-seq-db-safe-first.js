@@ -1,47 +1,45 @@
 var database = require('./tt-database');
 var parser = require('./tt-web-parser');
+parser.init();
+
+var parserDetail = function(doc) {
+
+    console.log("parser detail for " + doc.commic.href);
+
+    parser.parseRssDetail(doc.commic.href, function(chapter) {
+
+        parser.parseChapter(chapter, function(err, imageArray) {
+
+            if (err === null) {
+                database.updateCommicDetail(doc.commic, {
+                    info : chapter,
+                    images : imageArray
+                });
+            } else {
+                console.log("parse error: " + chapter.link);
+                database.insertLog({
+                    commic : doc.commic,
+                    chapter : chapter,
+                    reason : err
+                });
+            }
+        });
+    });
+
+}
 
 function parseRss() {
 
     database.findNotParesed(function(commics) {
 
-        console.log(commics.length);
         commics.each(function(err, doc) {
 
-            if (doc !== null && doc.commic !== null && doc.commic !== undefined) {
-                parser.parseRssDetail(doc.commic.href, function(chapter) {
-
-                    parser.parseChapter(chapter, function(err, imageArray) {
-
-                        if (err === null) {
-                            database.updateCommicDetail(doc, {
-                                info : chapter,
-                                images : imageArray
-                            });
-                        } else {
-                            console.log("parse error: " + chapter.link);
-                            database.insertLog({
-                                commic : comic,
-                                chapter : chapter,
-                                reason : err
-                            });
-                        }
-                    });
-                });
-            } else {
-                console.log('errr');
-                console.log(doc);
-            }
+            if (doc !== null)
+                parserDetail(doc);
 
         });
     });
 }
-
-database.init(function() {
-
-    parseRss();
-});
-parser.init();
 
 function parsePage() {
 
@@ -54,3 +52,8 @@ function parsePage() {
         });
     }
 }
+
+database.init(function() {
+
+    parseRss();
+});

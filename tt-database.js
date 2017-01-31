@@ -39,7 +39,7 @@ var database = {
                 return this;
             }
 
-            _db.collection('commic3').insertOne(comic, function(err, result) {
+            _db.collection('commic4').insertOne(comic, function(err, result) {
 
                 if (err == null) {
                     console.log("Detail inserted: " + comic.href);
@@ -55,31 +55,29 @@ var database = {
     },
     updateCommicDetail : function(comic, detail) {
 
-        var insertDocument = function(comic) {
+        if (comic == undefined) {
+            return this;
+        }
 
-            if (comic == undefined) {
-                return this;
+        _db.collection('commic3').update({
+            'commic.href' : comic.href
+        }, {
+            $push : {
+                chapter : {
+                    $each : [ detail ]
+                }
             }
 
-            _db.collection('commic3').update({
-                'commic.href' : comic.href
-            }, {
-                $push : {
-                    chapter : $each[detail]
-                }
+        }, function(err, result) {
 
-            }, function(err, result) {
+            if (err == null) {
+                console.log("Detail updated: " + detail.info.link);
+            } else {
+                console.log("errors: " + comic.href);
+                console.log(err);
+            }
+        });
 
-                if (err == null) {
-                    console.log("Detail updated: " + comic.href);
-                } else {
-                    console.log("errors: " + comic.href);
-                    console.log(err);
-                }
-            });
-        };
-
-        insertDocument(comic);
         return this;
     },
     findNotParesed : function(results) {
@@ -88,7 +86,7 @@ var database = {
             chapter : {
                 $exists : false
             }
-        }));
+        }).limit(400));
         console.log(results);
     }
 };
